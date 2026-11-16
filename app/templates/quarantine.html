@@ -1,0 +1,2 @@
+{% extends 'base.html' %}
+{% block panels %}<section class="panel data-panel"><div class="panel__head"><h2>班报隔离</h2><span>OEE / QUARANTINE</span></div><div class="panel__body flush">{{ table(data.quarantine,[('line','来源行'),('code','原因码'),('raw','原始记录')]) }}</div></section><section class="panel evidence-panel"><div class="panel__head"><h2>裁决依据</h2><span>LOCAL</span></div><div class="panel__body">{% for code,count in data.reason_counts.items() %}<div class="cause-row"><b>{{ code }}</b><span class="num">{{ count }}</span></div>{% endfor %}</div></section>{% endblock %}
