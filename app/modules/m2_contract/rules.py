@@ -19,6 +19,19 @@ def instant(text):
         return value.astimezone(timezone.utc)
     except (ValueError,AttributeError):reject("TIME","时间须包含偏移")
 
+def workorder(entry):
+    if not isinstance(entry,dict):return
+    if "order" in entry:
+        value=entry["order"]
+        if isinstance(value,bool) or not isinstance(value,(str,int)):reject("ORDER","工单号须为文本")
+        value=str(value).strip()
+        if value:entry["order"]=value
+        else:del entry["order"]
+    if "handover" in entry:
+        if not isinstance(entry["handover"],str):reject("HANDOVER","交接说明须为文本")
+        entry["handover"]=entry["handover"].strip()
+        if not entry["handover"]:del entry["handover"]
+
 def normalize(row):
     start,end=instant(row["start"]),instant(row["end"])
     if end<=start or (end-start).total_seconds()>86400:reject("TIME","班次长度无效")
@@ -29,6 +42,7 @@ def normalize(row):
         down=json.loads(row["downtime"]);breaks=json.loads(row["breaks"])
         if not isinstance(down,list) or not isinstance(breaks,list):raise ValueError()
     except (ValueError,TypeError):reject("INTERVAL","区间格式无效")
+    for entry in down:workorder(entry)
     return {**row,"source":{k:v for k,v in row.items() if k!="line"},"start":start.isoformat(),"end":end.isoformat(),"total":str(total),"good":str(good),"ideal_seconds":str(ideal),"downtime":down,"breaks":breaks}
 
 def deduplicate(rows):

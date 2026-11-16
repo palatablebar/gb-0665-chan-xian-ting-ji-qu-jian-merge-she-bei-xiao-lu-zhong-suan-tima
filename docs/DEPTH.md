@@ -1,7 +1,7 @@
 # 深度登记 产线停机裁决与效率重算
 
 - 规模：中型
-- 核心规则：班次按休息与停机所有端点切片，先扣休息并集，再按安全、故障、换型优先级分配停机。OEE使用未舍入的三因子计算，并保留超产异常。
+- 核心规则：班次按休息与停机所有端点切片，先扣休息并集，再按安全、故障、换型优先级分配停机。OEE使用未舍入的三因子计算，并保留超产异常。跨班工单归并为一条事件：归属记开始班，扣时按物理切片分给各班，补录片段与交接说明全部留痕。
 
 ## 功能模块
 
@@ -29,6 +29,7 @@
 | TRAP-19 | 停机多因重叠 | 静默误算或覆盖证据 | 显式安全故障换型优先级 | `app/modules/m3_model/rules.py` | `tests/test_model.py::test_priority` |
 | TRAP-23 | 相邻区间边界 | 静默误算或覆盖证据 | 半开片段不重计 | `app/modules/m3_model/rules.py` | `tests/test_model.py::test_half_open` |
 | TRAP-26 | 旧版复核 | 静默误算或覆盖证据 | 修订号条件更新 | `app/modules/m7_batches/rules.py` | `tests/test_batches.py::test_stale` |
+| TRAP-33 | 跨班工单拆分 | 责任错算、合计不见完整事件、补录重复扣 | 事件归开始班，切片并集扣时，申报与交接说明留痕 | `app/modules/m3_model/rules.py` | `tests/test_events.py::test_event_attributed_to_start_shift` |
 
 ## 对账规则
 计划分钟=运行分钟+有效停机分钟。班次总分钟=计划分钟+休息并集分钟。总产=良品+废品。起止时间使用含偏移的ISO格式，班次最长24小时。区间采用[start,end)，超出班次的停机裁剪，重叠休息只扣一次。total与good为整数件，ideal_seconds为每件理想秒数。零计划、零运行、零产量分别给出状态，不以任意分母补零。

@@ -3,6 +3,6 @@ from app.modules.m5_quarantine.service import summarize
 from .rules import reconcile,group_lines
 
 def run(options=None):
-    result=previous(options);result["reconciliation"]=reconcile(result);result["line_totals"]=group_lines(result["results"])
+    result=previous(options);result["reconciliation"]=reconcile(result);result["line_totals"]=group_lines(result["results"],result.get("events"))
     summarize(result)
     return result
